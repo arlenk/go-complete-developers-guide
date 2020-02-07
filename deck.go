@@ -3,6 +3,7 @@ package main
 import (
 	"fmt" 
 	"strings"
+	"io/ioutil"
 )
 
 type deck []string
@@ -32,3 +33,11 @@ func (d deck) toString() string {
 	s := strings.Join([]string (d), ",")
 	return s
 }
+
+func (d deck) toFile(filename string) error {
+	res := ioutil.WriteFile(filename,
+		[]byte(d.toString()),
+		0666)
+	return res
+}
+
