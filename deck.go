@@ -9,8 +9,11 @@ import (
 	"os"
 )
 
-type deck []string
-type card string
+type card struct {
+	suite string
+	value string
+}
+type deck []card
 
 func newDeck() deck {
 	suites := []string{"Spades", "Diamonds", "Hearts", "Clubs"}
@@ -18,8 +21,8 @@ func newDeck() deck {
 	cards := deck{}
 	for _, suite := range suites {
 		for _, value := range values {
-			cards = append(cards, value + " of " + suite)
-			
+			c := card{suite: suite, value: value}
+			cards = append(cards, c)
 		}
 	}
 	return cards;
@@ -28,7 +31,7 @@ func newDeck() deck {
 
 func (d deck) print() {
 	for i, card := range d {
-		fmt.Println(i, card)
+		fmt.Printf("%d %+v\n", i, card)
 	}
 }
 
@@ -40,14 +43,22 @@ func (d deck) shuffle() {
 	nc := len(d)
 	for i := range d {
 		j := r.Intn(nc - i) + i
-		fmt.Println("swapping ", i, j)
 		d[i], d[j] = d[j], d[i]
 	}
 }
 
 func (d deck) toString() string {
-	s := strings.Join([]string (d), ",")
-	return s
+	var b strings.Builder
+	b.Grow(10)
+	for i, c := range d {
+		if i > 0 {
+			b.WriteString(",")
+		}
+		b.WriteString(c.suite + "|" + c.value)
+		
+	}
+
+	return b.String()
 }
 
 func (d deck) toFile(filename string) error {
@@ -63,10 +74,17 @@ func fromFile(filename string) deck {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	cards := deck{}
 	str := string(bstring)
 	s := strings.Split(str, ",")
-	d := deck(s)
-	return d
+	for _, t := range(s) {
+		s_v := strings.Split(t, "|")
+		fmt.Println(s_v)
+		c := card{suite: s_v[0], value: s_v[1]}
+		cards = append(cards, c)
+	}
+
+	return cards
 }
 
 	
